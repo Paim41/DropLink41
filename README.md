@@ -1,180 +1,126 @@
-<div align="center">
+# DropLink
 
-<img width="90" height="90" alt="m41nitor-logo" src="https://github.com/user-attachments/assets/ddc29ff7-43e5-44aa-aa10-60fe33d72157" />
+DropLink is a modern temporary file-sharing app built with Next.js App Router, TypeScript, Tailwind CSS, Prisma, PostgreSQL, and Telegram Bot API storage support.
 
-# M41NITOR
-**A terminal-inspired file manager with unlimited storage — powered by Telegram.**
-
-Drag, drop, and forget about storage limits. Files route straight into your own private Telegram channels; PostgreSQL just remembers where everything went.
-
-[![Encrypted](https://img.shields.io/badge/AES--256--GCM-Encryption-F72585?style=for-the-badge&logoColor=212529)](#)
-[![Self Hosted](https://img.shields.io/badge/Self--Hosted-Storage-343A40?style=for-the-badge)](#)
-[![Type](https://img.shields.io/badge/Type-File%20Manager-212529?style=for-the-badge)](#)
-
-</div>
-
----
-
-## About
-
-M41NITOR is a **private, terminal-inspired file manager** that uses Telegram as its storage backend.
-
-Telegram holds the actual file content in your own private chats; PostgreSQL keeps the searchable metadata. The result is a black-and-pink terminal UI over what is effectively unlimited, free cloud storage — under your own control.
-
-> *"Your files. Your channels. Your terminal."*
-
----
-
-## Upload Flow
-
-```
-Drag & Drop / Paste
-    ↓
-Backend Inspection   →  MIME check, dangerous extension block, sanitize filename
-    ↓
-Integrity & Security →  SHA-256 checksum, duplicate check, optional AES-256-GCM
-    ↓
-Telegram Routing     →  Sent to the matching private channel by category
-    ↓
-Metadata Saved       →  PostgreSQL stores searchable record
-    ↓
-Terminal View        →  Grid / table, search, favourites, signed downloads
-```
-
----
+Users upload one or more files, configure expiry, password protection, recipient notes, and download limits, then receive a temporary public share link. Files are sent to a private Telegram channel or group through a bot. PostgreSQL stores metadata, policies, Telegram file references, access logs, notifications, and abuse reports.
 
 ## Features
 
-- **Admin Authentication** — bcrypt password hashing with HTTP-only, signed session cookies
-- **Flexible Uploads** — Drag-and-drop, multi-file, folder-capable, and clipboard-image uploads with real browser progress
-- **Hardened Pipeline** — Backend MIME inspection, dangerous extension blocking, filename sanitization, SHA-256 checksums, duplicate prevention, optional AES-256-GCM encryption, and category-based Telegram routing
-- **Full File Management** — Grid/table views, search, sorting, favourites, previews, signed downloads, soft delete, restore, permanent delete, metadata updates
-- **Audit & Recovery** — Audit logs, recovery records, health checks, and settings endpoints
-- **Zero Secret Exposure** — No bot token, chat ID, database URL, password, session token, or encryption key ever reaches browser code
+- Premium responsive glassmorphism UI using the requested palette: `#FFFAF3`, `#FFF2DB`, `#FFE5BF`, `#F62440`
+- Landing page, login, register, forgot password guidance, upload studio, share result, public download page, user dashboard, upload detail analytics, and admin routes
+- Drag-and-drop multi-file uploads with progress, file previews, skeleton loading, hover transitions, focus glow, and press effects
+- Temporary share links with expiry, optional password, maximum download count, recipient name, and note
+- Telegram Bot API upload and protected backend download streaming
+- Prisma models for users, uploads, upload files, download logs, notifications, and abuse reports
+- In-app notifications and optional Telegram owner notifications
+- Rate limiting, upload validation, password hashing, access logs, and protected management routes
 
----
+## Routes
 
-## Built For
-
-```
-Purpose  → Personal, private, self-hosted file storage
-Backend  → Telegram private channels (content) + PostgreSQL (metadata)
-Theme    → Black & pink terminal
-Not For  → Public file sharing or CDN-style hosting
-```
-
----
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js, TypeScript |
-| Database | PostgreSQL (Neon), Prisma |
-| Storage Backend | Telegram Bot API |
-| Security | bcrypt, AES-256-GCM, signed session cookies |
-| Styling | CSS |
-| Deployment | Docker, Vercel |
-
----
-
-## Project Structure
-
-```
-m41nitor/
-├── deploy/
-├── prisma/
-├── public/
-├── scripts/
-├── src/
-├── Dockerfile
-├── docker-compose.yml
-└── vercel.json
+```text
+/
+/login
+/register
+/forgot-password
+/upload
+/dashboard
+/dashboard/uploads
+/dashboard/uploads/[id]
+/share/[token]
+/admin
+/admin/uploads
+/admin/users
+/admin/reports
 ```
 
----
+## Local Setup
 
-## Setup Guide
-
-1. Create a Telegram bot via BotFather and copy the token into `TELEGRAM_BOT_TOKEN`
-2. Create private Telegram channels or groups for images, videos, audio, documents, archives, and other files
-3. Add the bot as an administrator to every private channel or group
-4. Grant posting and deletion permissions
-5. Obtain each chat ID safely — never paste real chat IDs into source code
-6. Copy `.env.example` to `.env` and configure every required environment variable
-7. Create the PostgreSQL database (e.g. [Neon](https://neon.tech)) and set `DATABASE_URL`
-8. Run `npm run prisma:generate` and `npm run prisma:migrate`
-9. Generate the admin password hash with `npm run hash-password` and set `ADMIN_PASSWORD_HASH`
-10. Start the dev server with `npm run dev`
-11. Test all Telegram destination mappings on the Destinations page
-12. Upload a small test file
-13. Test preview, download, soft delete, restore, and permanent deletion
-14. Configure database backups and protect the encryption key outside the database
-
----
-
-## Development
-
-```
+```bash
 npm install
+cp .env.example .env
 npm run prisma:generate
 npm run prisma:migrate
 npm run dev
 ```
 
-Runs at `http://localhost:3000`.
+Open `http://localhost:3000`.
 
-## Production
+## Environment Variables
 
+```text
+DATABASE_URL=
+SESSION_SECRET=
+ADMIN_EMAIL=
+ADMIN_PASSWORD_HASH=
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_API_BASE_URL=https://api.telegram.org
+
+TELEGRAM_PHOTO_CHAT_ID=
+TELEGRAM_VIDEO_CHAT_ID=
+TELEGRAM_AUDIO_CHAT_ID=
+TELEGRAM_DOCUMENT_CHAT_ID=
+TELEGRAM_ARCHIVE_CHAT_ID=
+TELEGRAM_OTHER_CHAT_ID=
+
+MAX_UPLOAD_SIZE_MB=50
+UPLOAD_RATE_LIMIT=30
+LOGIN_RATE_LIMIT=5
 ```
-npm ci
-npm run prisma:generate
+
+Generate an admin password hash with:
+
+```bash
+npm run hash-password
+```
+
+## Telegram Bot Integration
+
+1. Create a bot with BotFather and set `TELEGRAM_BOT_TOKEN`.
+2. Create private Telegram channels or groups for each file category, or reuse one channel for all categories.
+3. Add the bot as an administrator with permission to post messages.
+4. Set the matching chat IDs in `.env`.
+5. Upload a small test file from `/upload`.
+6. Confirm that the private Telegram destination receives the file and that `/share/[token]` streams it through the backend.
+
+Telegram is not the main database. It stores file bytes and supports notifications. PostgreSQL stores the durable metadata and access policy.
+
+## Database
+
+The Prisma schema includes:
+
+- `User`
+- `Upload`
+- `UploadFile`
+- `DownloadLog`
+- `Notification`
+- `AbuseReport`
+- Existing support tables for Telegram destinations, security settings, audit logs, recovery, and file-manager compatibility
+
+Apply migrations with:
+
+```bash
+npm run prisma:migrate
+```
+
+Production deployments should run:
+
+```bash
 npm run prisma:deploy
 npm run build
 npm run start
 ```
 
-Use HTTPS in production. Set a strong `SESSION_SECRET`, secure your PostgreSQL access, and store `FILE_ENCRYPTION_KEY` in a secret manager.
+## Security Notes
 
-## Docker
+- Link passwords are hashed with bcrypt.
+- Session cookies are HTTP-only and signed with `SESSION_SECRET`.
+- Download attempts are logged with status, IP address, and user agent.
+- Upload and download endpoints are rate limited.
+- Telegram bot tokens, raw Telegram file URLs, and chat IDs are never sent to browser code.
+- Public downloads are streamed through `/api/droplink/file/[id]` after share-token policy checks.
 
-```
-docker compose up --build
-docker compose run --rm app npm run prisma:deploy
-```
+## Deployment
 
----
-
-## Telegram Bot API
-
-Defaults to the Telegram cloud Bot API. To use a self-hosted Local Bot API server:
-
-```
-TELEGRAM_API_BASE_URL=https://telegram-bot-api.example.com
-```
-
-Files are not silently split — chunking exists in the schema but must be explicitly enabled per your deployment limits.
-
----
-
-## Backups
-
-Back up PostgreSQL regularly. Telegram holds the content, but the database holds the only searchable metadata and message references. M41NITOR should not be treated as your only backup.
-
----
-
-## Roadmap / Ideas
-
-- [ ] Explicit chunked-upload support for very large files
-- [ ] Shared/read-only access links
-- [ ] Multi-admin roles and permissions
-- [ ] Mobile-optimised terminal view
-- [ ] Storage usage dashboard per category
-
----
-
-<div align="center">
-
-*M41NITOR — your files, your channels, your terminal.*
-
-</div>
+Set all environment variables in your host, run Prisma deploy, then build and start the Next.js app. Use HTTPS in production and set `NEXT_PUBLIC_APP_URL` to the public origin so generated share links and QR codes point to the correct domain.

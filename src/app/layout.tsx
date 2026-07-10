@@ -1,22 +1,22 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import "./globals.css";
 
-const mono = IBM_Plex_Mono({
-  variable: "--font-terminal",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
-  title: "M41NITOR",
-  description: "M41NITOR — Telegram-backed expandable storage for private file operations.",
+  title: "DropLink",
+  description: "DropLink is a premium temporary file-sharing app using Telegram Bot API storage and PostgreSQL metadata.",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
-    title: "M41NITOR",
+    statusBarStyle: "default",
+    title: "DropLink",
   },
   icons: {
     icon: [
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#000000",
+  themeColor: "#FFFAF3",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -40,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${mono.variable} h-full antialiased`}>
+    <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <ServiceWorkerRegistration />
         {children}

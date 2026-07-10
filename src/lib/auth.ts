@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { env, isProduction, requireEnv } from "./env";
+import { env, isProduction } from "./env";
 import { prisma } from "./db";
 import { randomToken, signValue, verifySignature } from "./crypto";
 
@@ -78,16 +78,26 @@ export async function ensureAdminUser(email: string, passwordHash: string) {
 }
 
 export async function verifyAdminCredentials(email: string, password: string) {
-  const expectedEmail = requireEnv("ADMIN_EMAIL").toLowerCase();
-  const expectedHash = requireEnv("ADMIN_PASSWORD_HASH");
+  if (!env.ADMIN_EMAIL || !env.ADMIN_PASSWORD_HASH) return null;
+  const expectedEmail = env.ADMIN_EMAIL.toLowerCase();
+  const expectedHash = env.ADMIN_PASSWORD_HASH;
   if (email.toLowerCase() !== expectedEmail) return null;
   const ok = await bcrypt.compare(password, expectedHash);
   if (!ok) return null;
   return ensureAdminUser(expectedEmail, expectedHash);
 }
 
+export async function verifyUserCredentials(email: string, password: string) {
+  const admin = await verifyAdminCredentials(email, password);
+  if (admin) return admin;
+  const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
+  if (!user) return null;
+  const ok = await bcrypt.compare(password, user.passwordHash);
+  return ok ? user : null;
+}
+
 export function authConfigured() {
-  return Boolean(env.ADMIN_EMAIL && env.ADMIN_PASSWORD_HASH && env.SESSION_SECRET);
+  return Boolean(env.SESSION_SECRET);
 }
 
 export function issueCsrf() {

@@ -75,6 +75,18 @@ export async function deleteTelegramMessage(chatId: string, messageId: number) {
   });
 }
 
+export async function sendTelegramNotification(input: { chatId: string; text: string }) {
+  return telegram<{ message_id: number }>("sendMessage", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      chat_id: input.chatId,
+      text: input.text.slice(0, 3900),
+      disable_web_page_preview: true,
+    }),
+  });
+}
+
 export async function testTelegramDestination(chatId: string) {
   const started = Date.now();
   try {

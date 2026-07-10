@@ -1,5 +1,5 @@
-import M41nitorTerminal from "@/components/M41nitor";
+import Landing from "@/components/droplink/Landing";
 
 export default function Home() {
-  return <M41nitorTerminal />;
+  return <Landing />;
 }

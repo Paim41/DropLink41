@@ -69,7 +69,7 @@ export async function POST(request: Request) {
           buffer: uploadBuffer,
           filename: inspected.originalName,
           mimeType: inspected.mimeType,
-          caption: "M41NITOR upload successful 🥰",
+          caption: "DropLink storage upload successful",
         });
       } catch (error) {
         await prisma.uploadRecovery.create({
@@ -79,7 +79,7 @@ export async function POST(request: Request) {
             checksum,
             category: inspected.category,
             telegramChatId: destination.chatId,
-            reason: error instanceof Error ? error.message : "Telegram upload failed 🥲",
+            reason: error instanceof Error ? error.message : "Telegram upload failed",
             payload: { phase: "telegram_upload" },
           },
         });

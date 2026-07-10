@@ -3,9 +3,9 @@ import { PolicyPage } from "@/components/PolicyPage";
 export default function DataRetentionPage() {
   return (
     <PolicyPage title="Data Retention Policy">
-      <p>Soft-deleted files remain in Trash and keep their Telegram messages until an administrator permanently deletes them.</p>
-      <p>Permanent deletion attempts to delete the Telegram message and then removes the metadata record, while retaining only audit information needed for operational accountability.</p>
-      <p>Files may become unavailable if the Telegram account, bot, group, channel, or message is deleted outside M41NITOR.</p>
+      <p>Expired links become inaccessible after their configured expiry time or after their maximum download count is reached.</p>
+      <p>Metadata deletion removes the share link and related file records, while retaining only operational logs required for accountability where configured.</p>
+      <p>Files may become unavailable if the Telegram account, bot, group, channel, or message is deleted outside DropLink.</p>
     </PolicyPage>
   );
 }

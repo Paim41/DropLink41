@@ -2,14 +2,14 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "M41NITOR",
-    short_name: "M41NITOR",
-    description: "M41NITOR — Telegram-backed expandable storage for private file operations.",
+    name: "DropLink",
+    short_name: "DropLink",
+    description: "Temporary file sharing with Telegram Bot API storage and policy-controlled public links.",
     start_url: "/",
     scope: "/",
     display: "standalone",
-    background_color: "#000000",
-    theme_color: "#000000",
+    background_color: "#FFFAF3",
+    theme_color: "#F62440",
     orientation: "portrait",
     categories: ["productivity", "utilities"],
     icons: [

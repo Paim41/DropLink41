@@ -47,13 +47,120 @@ enum AuditAction {
 
 model User {
   id           String       @id @default(cuid())
+  name         String?
   email        String       @unique
   passwordHash String
   role         String       @default("admin")
+  telegramChatId String?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   files        FileRecord[]
   auditLogs    AuditLog[]
+  uploads      Upload[]
+  notifications Notification[]
+}
+
+enum LinkStatus {
+  active
+  disabled
+  expired
+  limit_reached
+  archived
+}
+
+enum DownloadStatus {
+  allowed
+  password_required
+  password_failed
+  expired
+  limit_reached
+  disabled
+  not_found
+}
+
+enum NotificationType {
+  upload_success
+  download_event
+  link_expired
+  limit_reached
+  suspicious_activity
+}
+
+model Upload {
+  id               String        @id @default(cuid())
+  userId           String?
+  user             User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  shareToken       String        @unique
+  title            String
+  note             String?
+  recipientName    String?
+  passwordHash     String?
+  expiresAt        DateTime
+  maxDownloads     Int?
+  currentDownloads Int           @default(0)
+  status           LinkStatus    @default(active)
+  totalSize        BigInt        @default(0)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  files            UploadFile[]
+  downloadLogs     DownloadLog[]
+  abuseReports     AbuseReport[]
+
+  @@index([userId, createdAt])
+  @@index([status, expiresAt])
+}
+
+model UploadFile {
+  id                String   @id @default(cuid())
+  uploadId          String
+  upload            Upload   @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  originalName      String
+  mimeType          String
+  sizeBytes         BigInt
+  telegramFileId    String?
+  telegramMessageId Int?
+  telegramChatId    String?
+  createdAt         DateTime @default(now())
+
+  @@index([uploadId])
+}
+
+model DownloadLog {
+  id           String         @id @default(cuid())
+  uploadId     String
+  upload       Upload         @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  ipAddress    String?
+  userAgent    String?
+  downloadedAt DateTime       @default(now())
+  status       DownloadStatus
+  metadata     Json?
+
+  @@index([uploadId, downloadedAt])
+  @@index([status, downloadedAt])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String?
+  user      User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model AbuseReport {
+  id         String   @id @default(cuid())
+  uploadId   String
+  upload     Upload   @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  reason     String
+  reportedBy String?
+  createdAt  DateTime @default(now())
+
+  @@index([uploadId, createdAt])
 }
 
 model TelegramDestination {
