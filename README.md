@@ -1,23 +1,89 @@
+<div align="center">
+
+<img width="90" height="90" alt="droplink-logo" src="https://github.com/user-attachments/assets/91329fb5-732c-4195-a508-eec51831d5c2" />
+
 # DropLink
+**A temporary, Telegram-backed file sharing app — expiry, passwords, and download limits built in.**
 
-DropLink is a modern temporary file-sharing app built with Next.js App Router, TypeScript, Tailwind CSS, Prisma, PostgreSQL, and Telegram Bot API storage support.
+Upload once, share a link, and let it disappear on your terms. Files route into a private Telegram channel or group through a bot; PostgreSQL keeps every policy, log, and reference.
 
-Users upload one or more files, configure expiry, password protection, recipient notes, and download limits, then receive a temporary public share link. Files are sent to a private Telegram channel or group through a bot. PostgreSQL stores metadata, policies, Telegram file references, access logs, notifications, and abuse reports.
+[![Temporary Links](https://img.shields.io/badge/Expiring-Share%20Links-F62440?style=for-the-badge)](https://github.com/Paim41/DropLink41)
+[![Telegram Storage](https://img.shields.io/badge/Telegram-Bot%20API%20Storage-FFE5BF?style=for-the-badge&logo=telegram&logoColor=F62440)](https://github.com/Paim41/DropLink41)
+[![Password Protected](https://img.shields.io/badge/Password-Protected%20Links-FFF2DB?style=for-the-badge)](https://github.com/Paim41/DropLink41)
+[![Type](https://img.shields.io/badge/Type-File%20Sharing-FFFAF3?style=for-the-badge)](https://github.com/Paim41/DropLink41)
+
+</div>
+
+---
+
+## About
+
+DropLink is a **modern, temporary file-sharing app** built with Next.js App Router, TypeScript, Tailwind CSS, Prisma, PostgreSQL, and Telegram Bot API storage.
+
+Users upload one or more files, configure expiry, an optional password, a recipient note, and a download limit, then get back a temporary public share link. The files themselves are sent to a private Telegram channel or group through a bot; PostgreSQL stores the metadata, access policy, Telegram file references, access logs, notifications, and abuse reports.
+
+> *"Share it. Limit it. Let it expire."*
+
+---
+
+## Share Flow
+
+```
+Drag & Drop / Select Files
+    ↓
+Upload Studio        →  Set expiry, optional password, download limit, recipient note
+    ↓
+Telegram Delivery     →  File sent to private Telegram channel/group via bot
+    ↓
+Metadata Saved        →  PostgreSQL stores policy, file refs, and access rules
+    ↓
+Share Link Issued      →  Temporary public /share/[token] link generated
+    ↓
+Protected Download     →  Streamed through backend after policy checks
+```
+
+---
 
 ## Features
 
-- Premium responsive glassmorphism UI using the requested palette: `#FFFAF3`, `#FFF2DB`, `#FFE5BF`, `#F62440`
-- Landing page, login, register, forgot password guidance, upload studio, share result, public download page, user dashboard, upload detail analytics, and admin routes
-- Drag-and-drop multi-file uploads with progress, file previews, skeleton loading, hover transitions, focus glow, and press effects
-- Temporary share links with expiry, optional password, maximum download count, recipient name, and note
-- Telegram Bot API upload and protected backend download streaming
-- Prisma models for users, uploads, upload files, download logs, notifications, and abuse reports
-- In-app notifications and optional Telegram owner notifications
-- Rate limiting, upload validation, password hashing, access logs, and protected management routes
+- **Premium Glassmorphism UI** — responsive design in a warm palette (`#FFFAF3`, `#FFF2DB`, `#FFE5BF`, `#F62440`) with skeleton loading, hover transitions, focus glow, and press effects
+- **Full Page Set** — landing page, login, register, forgot-password guidance, upload studio, share result, public download page, user dashboard, upload detail analytics, and admin routes
+- **Flexible Uploads** — drag-and-drop, multi-file uploads with real progress and previews
+- **Configurable Share Links** — expiry, optional password, maximum download count, recipient name, and note per link
+- **Telegram-Backed Storage** — upload via Telegram Bot API, with protected backend streaming for downloads (no raw Telegram URLs ever reach the browser)
+- **Data Model** — Prisma models for users, uploads, upload files, download logs, notifications, and abuse reports
+- **Notifications** — in-app notifications plus optional Telegram owner notifications
+- **Hardened Access** — rate limiting, upload validation, bcrypt password hashing, access logging, and protected management routes
+
+---
+
+## Built For
+
+```
+Purpose  → Temporary, policy-controlled file sharing via public links
+Backend  → Telegram private channel/group (content) + PostgreSQL (metadata & policy)
+Theme    → Warm glassmorphism (FFFAF3 / FFF2DB / FFE5BF / F62440)
+Not For  → Permanent storage or public CDN-style hosting
+```
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js (App Router), TypeScript |
+| Styling | Tailwind CSS |
+| Database | PostgreSQL, Prisma |
+| Storage Backend | Telegram Bot API |
+| Security | bcrypt, signed session cookies, rate limiting |
+| Deployment | Docker, Vercel |
+
+---
 
 ## Routes
 
-```text
+```
 /
 /login
 /register
@@ -33,21 +99,44 @@ Users upload one or more files, configure expiry, password protection, recipient
 /admin/reports
 ```
 
-## Local Setup
+---
 
-```bash
-npm install
-cp .env.example .env
-npm run prisma:generate
-npm run prisma:migrate
-npm run dev
+## Project Structure
+
+```
+DropLink41/
+├── deploy/
+├── prisma/
+├── public/
+├── scripts/
+├── src/
+├── Dockerfile
+├── docker-compose.yml
+└── vercel.json
 ```
 
-Open `http://localhost:3000`.
+---
+
+## Setup Guide
+
+1. Create a Telegram bot via BotFather and copy the token into `TELEGRAM_BOT_TOKEN`
+2. Create a private Telegram channel or group per file category, or reuse one channel for all categories
+3. Add the bot as an administrator with permission to post messages
+4. Copy `.env.example` to `.env` and set the matching chat IDs plus every other required variable
+5. Create the PostgreSQL database and set `DATABASE_URL`
+6. Run `npm run prisma:generate` and `npm run prisma:migrate`
+7. Generate the admin password hash with `npm run hash-password` and set `ADMIN_PASSWORD_HASH`
+8. Start the dev server with `npm run dev`
+9. Upload a small test file from `/upload`
+10. Confirm the private Telegram destination receives the file
+11. Confirm `/share/[token]` streams the download through the backend
+12. Set `NEXT_PUBLIC_APP_URL` to your public origin before generating real links or QR codes
+
+---
 
 ## Environment Variables
 
-```text
+```
 DATABASE_URL=
 SESSION_SECRET=
 ADMIN_EMAIL=
@@ -69,22 +158,40 @@ UPLOAD_RATE_LIMIT=30
 LOGIN_RATE_LIMIT=5
 ```
 
-Generate an admin password hash with:
+---
 
-```bash
-npm run hash-password
+## Development
+
+```
+npm install
+cp .env.example .env
+npm run prisma:generate
+npm run prisma:migrate
+npm run dev
 ```
 
-## Telegram Bot Integration
+Runs at `http://localhost:3000`.
 
-1. Create a bot with BotFather and set `TELEGRAM_BOT_TOKEN`.
-2. Create private Telegram channels or groups for each file category, or reuse one channel for all categories.
-3. Add the bot as an administrator with permission to post messages.
-4. Set the matching chat IDs in `.env`.
-5. Upload a small test file from `/upload`.
-6. Confirm that the private Telegram destination receives the file and that `/share/[token]` streams it through the backend.
+## Production
 
-Telegram is not the main database. It stores file bytes and supports notifications. PostgreSQL stores the durable metadata and access policy.
+```
+npm ci
+npm run prisma:generate
+npm run prisma:deploy
+npm run build
+npm run start
+```
+
+Use HTTPS in production, set a strong `SESSION_SECRET`, and point `NEXT_PUBLIC_APP_URL` at your public domain.
+
+## Docker
+
+```
+docker compose up --build
+docker compose run --rm app npm run prisma:deploy
+```
+
+---
 
 ## Database
 
@@ -96,31 +203,35 @@ The Prisma schema includes:
 - `DownloadLog`
 - `Notification`
 - `AbuseReport`
-- Existing support tables for Telegram destinations, security settings, audit logs, recovery, and file-manager compatibility
+- Supporting tables for Telegram destinations, security settings, audit logs, and recovery
 
-Apply migrations with:
-
-```bash
-npm run prisma:migrate
-```
-
-Production deployments should run:
-
-```bash
-npm run prisma:deploy
-npm run build
-npm run start
-```
+---
 
 ## Security Notes
 
-- Link passwords are hashed with bcrypt.
-- Session cookies are HTTP-only and signed with `SESSION_SECRET`.
-- Download attempts are logged with status, IP address, and user agent.
-- Upload and download endpoints are rate limited.
-- Telegram bot tokens, raw Telegram file URLs, and chat IDs are never sent to browser code.
-- Public downloads are streamed through `/api/droplink/file/[id]` after share-token policy checks.
+- Link passwords are hashed with bcrypt
+- Session cookies are HTTP-only and signed with `SESSION_SECRET`
+- Download attempts are logged with status, IP address, and user agent
+- Upload and download endpoints are rate limited
+- Telegram bot tokens, raw Telegram file URLs, and chat IDs never reach browser code
+- Public downloads stream through `/api/droplink/file/[id]` only after share-token policy checks pass
 
-## Deployment
+---
 
-Set all environment variables in your host, run Prisma deploy, then build and start the Next.js app. Use HTTPS in production and set `NEXT_PUBLIC_APP_URL` to the public origin so generated share links and QR codes point to the correct domain.
+## Roadmap / Ideas
+
+- [ ] Bulk link management from the dashboard
+- [ ] Custom expiry presets and reminders before a link expires
+- [ ] Shareable QR codes on the share result page
+- [ ] Multi-admin roles and permissions
+- [ ] Storage usage dashboard per Telegram destination
+
+---
+
+<div align="center">
+
+*DropLink — share it, limit it, let it expire.*
+
+[github.com/Paim41/DropLink41](https://github.com/Paim41/DropLink41)
+
+
